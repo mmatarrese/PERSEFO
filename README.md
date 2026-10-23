@@ -1,6 +1,6 @@
 # PERSEFO: single-subject EEG feature extraction
 
-MATLAB script that extracts per-channel and network-level features for one subject from Brainstorm outputs: amplitude envelope correlation (AEC) connectivity matrices and a 1/f-normalized power spectral density (PSD).
+MATLAB code that extracts per-channel and network-level features for one subject from Brainstorm outputs: amplitude envelope correlation (AEC) connectivity matrices and a 1/f-compensated power spectral density (PSD). The Brainstorm preprocessing and the computation of AEC and PSD are documented in an illustrative script.
 
 This code accompanies the paper:
 
@@ -10,6 +10,7 @@ This code accompanies the paper:
 
 ```text
 .
+├── EEG_Preprocessing_AEC_PSD.m  # Brainstorm preprocessing, AEC and PSD (illustrative)
 ├── MAIN_Features_Extraction.m   # Feature-extraction script (one subject)
 ├── functions/
 │   ├── GetConnectMatrix.m       # Adapted from Brainstorm (bst_memory.m)
@@ -35,20 +36,31 @@ This code accompanies the paper:
 - Brainstorm, initialized in the MATLAB session, so that `process_compress_sym.m` is on the path. It is used by `functions/GetConnectMatrix.m` to expand compressed symmetric connectivity matrices.
 - The BCT functions used by the script are included in `functions/`. No separate BCT installation is needed.
 
-PSD and AEC are computed beforehand in Brainstorm. This repository does not compute them.
+AEC and PSD are computed beforehand in Brainstorm, as described in the next section.
+
+## Preprocessing, AEC and PSD (Brainstorm)
+
+`EEG_Preprocessing_AEC_PSD.m` lists the Brainstorm calls used to prepare the inputs of `MAIN_Features_Extraction.m`. It is provided for illustration: these steps were performed in Brainstorm on the raw recordings and must not be repeated on preprocessed data. To run the calls, `sFiles` must contain the Brainstorm files of the raw recording and `subjectname` must be defined.
+
+1. Selection of a 180-s artifact-free segment by visual inspection, excluding interictal and ictal epileptiform discharges (done manually).
+2. DC offset removal, 50-Hz IIR notch filter, 1–70 Hz linear-phase FIR band-pass filter (Kaiser window), average reference.
+3. ICA (Picard) to remove ocular and cardiac artifacts. Artifact components are selected by visual inspection.
+4. AEC without orthogonalization (`process_henv1n`, `penv`, Hilbert envelope) in five bands: delta 2–4 Hz, theta 5–7 Hz, alpha 8–12 Hz, beta 15–29 Hz, gamma 30–59 Hz.
+5. PSD with Welch's method (4-s windows, 50% overlap), then 1/f compensation by multiplying the PSD by frequency (`process_tf_norm`, `multiply2020`).
 
 ## Expected inputs
 
 Set the workspace variable `patient_folder` to the Brainstorm folder of one subject. The folder must contain:
 
 - the AEC file: name matching `*henv*`, `DisplayUnits` equal to `Envelope correlation`;
-- the orthogonalized AEC file: name matching `*henv*`, `DisplayUnits` equal to `Orthogonalized envelope correlation`. Only its channel labels are used;
-- exactly one PSD file with name matching `*multiply*` (1/f-normalized PSD).
+- exactly one PSD file with name matching `*multiply*` (1/f-compensated PSD).
+
+Other `*henv*` files in the folder (for example orthogonalized AEC) are ignored.
 
 Constraints:
 
 - 19 channels (fixed in the script).
-- The three files must have the same channel order. The script checks this with `assert`.
+- The AEC and PSD files must have the same channel order. The script checks this with `assert`.
 - Every `*henv*` file in the folder must contain the `DisplayUnits` field. If more than one file has the same `DisplayUnits`, the last one found is used.
 - `sub_name` is set inside the script and must be edited for each subject.
 

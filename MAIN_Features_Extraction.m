@@ -1,6 +1,6 @@
 % Run feature extraction for a single subject using Brainstorm output files.
 % Set patient_folder to the Brainstorm results folder containing the AEC
-% connectivity matrices (*henv*.mat) and the 1/f-normalized PSD (*multiply*.mat).
+% connectivity matrix (*henv*.mat) and the 1/f-compensated PSD (*multiply*.mat).
 % MATLAB will change its current working directory to patient_folder.
 % Required MATLAB products: MATLAB R2016a or later (graph, minspantree,
 % distances, centrality) and Statistics and Machine Learning Toolbox
@@ -22,17 +22,13 @@ for i = 1:length(EC)
     tmp = load(EC(i).name, 'DisplayUnits');
     if strcmp(tmp.DisplayUnits, 'Envelope correlation')
         AEC = load(EC(i).name);
-    elseif strcmp(tmp.DisplayUnits, 'Orthogonalized envelope correlation')
-        oEC = load(EC(i).name);
     end
 end
-
-% Check that the connectivity files share the same channel order
+assert(exist('AEC', 'var') == 1, 'No *henv* file with DisplayUnits ''Envelope correlation'' found.');
 assert(isequal(AEC.RowNames(:), AEC.RefRowNames(:)), 'AEC: RowNames and RefRowNames differ.');
-assert(isequal(AEC.RowNames(:), oEC.RowNames(:)), 'Channel order differs between AEC and oEC files.');
 
 ID_rep = repmat(sub_name, 19, 1);
-channel_labels = oEC.RowNames';
+channel_labels = AEC.RowNames';
 DB = dataset; DB.ID = ID_rep; DB.channel=channel_labels;
 DB_norm = dataset; DB_norm.ID = ID_rep; DB_norm.channel=channel_labels;
 FC = dataset; FC.ID = sub_name;
@@ -122,7 +118,7 @@ for f=1:length(freqband)
     
     % Spectral Analysis
     psdensity=dir('*multiply*'); psdensity=load(psdensity.name);
-    assert(isequal(psdensity.RowNames(:), oEC.RowNames(:)), 'Channel order differs between PSD and connectivity files.');
+    assert(isequal(psdensity.RowNames(:), AEC.RowNames(:)), 'Channel order differs between PSD and AEC files.');
     freq_vec = round(psdensity.Freqs);
     
     spectrum = squeeze(psdensity.TF);
