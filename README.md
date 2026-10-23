@@ -1,4 +1,4 @@
-# PERSEFO: single-subject EEG feature extraction
+# PERSEFO: PERsonalized Anti-Seizure Medication SElection in FOcal Epilepsy
 
 MATLAB code that extracts per-channel and network-level features for one subject from Brainstorm outputs: amplitude envelope correlation (AEC) connectivity matrices and a 1/f-compensated power spectral density (PSD). The Brainstorm preprocessing and the computation of AEC and PSD are documented in an illustrative script.
 
