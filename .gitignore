@@ -1,0 +1,22 @@
+# MATLAB temporary and autosave files
+*.asv
+*.m~
+*.autosave
+slprj/
+
+# Data files: patient data must not be committed
+*.mat
+*.edf
+*.bdf
+*.set
+*.fdt
+*.eeg
+*.vhdr
+*.vmrk
+*.csv
+*.xlsx
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
