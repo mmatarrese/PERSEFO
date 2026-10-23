@@ -4,7 +4,7 @@ MATLAB script that extracts per-channel and network-level features for one subje
 
 This code accompanies the paper:
 
-> TODO: authors, title, journal, year, DOI.
+> Ricci L, Matarrese MAG, et al. Bayesian modeling reveals drug-specific EEG fingerprints for treatment selection in focal epilepsy. *Brain Communications*, 2026.
 
 ## Repository contents
 
@@ -30,9 +30,9 @@ This code accompanies the paper:
 
 ## Requirements
 
-- MATLAB R2016a or later (`graph`, `minspantree`, `distances`, `centrality`). Tested with: TODO.
+- MATLAB R2016a or later (`graph`, `minspantree`, `distances`, `centrality`). Tested with MATLAB R2021a.
 - Statistics and Machine Learning Toolbox (`dataset`, `nanmean`, `nanmedian`, `nanmax`).
-- Brainstorm, initialized in the MATLAB session, so that `process_compress_sym.m` is on the path. It is used by `functions/GetConnectMatrix.m` to expand compressed symmetric connectivity matrices. Tested with: TODO.
+- Brainstorm, initialized in the MATLAB session, so that `process_compress_sym.m` is on the path. It is used by `functions/GetConnectMatrix.m` to expand compressed symmetric connectivity matrices.
 - The BCT functions used by the script are included in `functions/`. No separate BCT installation is needed.
 
 PSD and AEC are computed beforehand in Brainstorm. This repository does not compute them.
